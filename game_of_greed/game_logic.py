@@ -5,6 +5,7 @@ class GameLogic:
 	@staticmethod
 	def calculate_score(diceroll):
 		points = 0
+		## START COUNTING DIE
 		numberCounts = {
 			6: 0,
 			5: 0,
@@ -15,19 +16,29 @@ class GameLogic:
 		}
 		for value in diceroll:
 			numberCounts[value] += 1
+		## END COUNTING DIE
+
+		## START CHECKING FOR PAIRS
 		pairs = 0
 		for value in numberCounts:
 			if numberCounts[value] == 2:
 				pairs+=1
 		if pairs == 3:
 			return 750
+		## END CHECKING FOR PAIRS
+
+		## START CHECKING FOR A STRAIGHT
 		else:
+			#rework for less than 6 die
 			straight = True
 			for value in numberCounts:
 				if numberCounts[value] != 1:
 					straight = False
 			if straight:
 				return 1500
+		## END CHECKING FOR A STRAIGHT
+
+		## START BASE CASES
 			for value in numberCounts:
 				if value != 1 and numberCounts[value] > 2:
 					points += value*100*(numberCounts[value]-2)
@@ -42,12 +53,13 @@ class GameLogic:
 
 	@staticmethod
 	def roll_dice(count):
+		## PREVENT BAD USER INPUTS
 		if type(count) is not int:
 			count = 6
 		count = max(min(count, 6), 1)
-		rolled_die = tuple(random.randint(1, 6) for i in range(count))
-		print(rolled_die)
-		return(rolled_die)
+
+		# GENERATE THE TUPLE
+		return(tuple(random.randint(1, 6) for i in range(count)))
 
 class Banker:
 
