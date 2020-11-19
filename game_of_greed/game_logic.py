@@ -120,7 +120,7 @@ class Banker:
 		self.shelved = 0
 
 	def shelf(self, points=0):
-		self.shelved = points
+		self.shelved += points
 
 	def bank(self):
 		roundPoints = self.shelved
