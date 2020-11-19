@@ -51,6 +51,8 @@ class GameLogic:
 					points += 50*numberCounts[value]
 			return points
 
+	
+
 	@staticmethod
 	def roll_dice(count):
 		## PREVENT BAD USER INPUTS
