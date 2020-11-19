@@ -46,9 +46,15 @@ class Game:
             game_round += 1
             print(f"Starting round {game_round}")
             print(f"Rolling {remaing_die} dice...")
+<<<<<<< HEAD
             die_roll = session.roll_dice(remaing_die)
             string_roll = [str(int) for int in die_roll]
             print(f'*** {" ".join(string_roll)} ***')
+=======
+            die_roll = session.roll_dice(remaing_die)  
+            string_roll = [str(int) for int in die_roll]
+            print(f'*** {string_roll} ***')
+>>>>>>> 9bea4cb31d828044f2d6a524a710154456615efa
             print("Enter dice to keep, or (q)uit:")
             kept_die = input("> ")
             if kept_die == "q":
@@ -76,7 +82,25 @@ class Game:
                 elif round_choice == "r":
                     point_total += shelf_points
             print(f"Total score is {point_total} points")
+<<<<<<< HEAD
                     
+=======
+
+                    
+
+
+
+
+
+
+
+
+
+
+        
+
+
+>>>>>>> 9bea4cb31d828044f2d6a524a710154456615efa
 if __name__ == "__main__":
     game = Game()
     game.play()
