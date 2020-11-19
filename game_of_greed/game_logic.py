@@ -3,6 +3,56 @@ import random
 class GameLogic:
 
 	@staticmethod
+	def get_scorers(test_input):
+		truthy_scorers = []
+		numberCounts = {
+			6: 0,
+			5: 0,
+			4: 0,
+			3: 0,
+			2: 0,
+			1: 0,
+		}
+		
+		for value in test_input:
+				numberCounts[value] += 1
+
+		pairs = 0
+		for value in numberCounts:
+			if numberCounts[value] == 2:
+				pairs+=1
+		if pairs == 3:
+			for value in numberCounts:
+				if numberCounts[value] == 2:
+					truthy_scorers.extend([value, value])
+
+		straight = True
+		for value in numberCounts:
+			if numberCounts[value] != 1:
+				straight = False
+		if straight:
+			truthy_scorers.extend([1, 2, 3, 4, 5, 6])
+
+		if not len(truthy_scorers):
+			for value in numberCounts:
+				value_type = [value for i in range(numberCounts[value])]
+				if GameLogic.calculate_score(value_type):
+					truthy_scorers.extend(value_type)
+
+		return tuple(truthy_scorers)
+
+	@staticmethod
+	def validate_keepers(diceroll, keepers):
+		no_cheat = True
+		roll_list = [value for value in diceroll]
+		for value in keepers:
+			if value not in roll_list:
+				no_cheat = False
+			else:
+				roll_list.remove(value)
+		return no_cheat
+
+	@staticmethod
 	def calculate_score(diceroll):
 		points = 0
 		## START COUNTING DIE

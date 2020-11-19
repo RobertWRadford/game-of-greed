@@ -9,6 +9,8 @@ class Game:
     def __init__(self, num_rounds=20):
         self.banker = Banker()
         self.num_rounds = num_rounds
+        self._roller = None
+        self.round_num = 0
 
     def play(self, roller=None):
         """Entry point for playing (or declining) a game
@@ -37,11 +39,11 @@ class Game:
 
     def new_roll(self, session, game_round, remaining_die):
         print(f"Rolling {remaining_die} dice...")
-        die_roll = session.roll_dice(remaining_die)
+        die_roll = self._roller(remaining_die)
         string_roll = [str(int) for int in die_roll]
         return (die_roll, string_roll)
 
-    def check_validity(self, bank, die_roll, string_roll):
+    def check_validity(self, session, bank, die_roll, string_roll):
         cheated = True
         while cheated:
             cheated = False
@@ -63,10 +65,9 @@ class Game:
                 continue
 
             user_selection = tuple(int(char) for char in kept_die)
-            for value in user_selection:
-                if value not in die_roll:
-                    cheated = True
-            if cheated:
+            no_cheats = session.validate_keepers(die_roll, user_selection)
+            if not no_cheats:
+                cheated = True
                 print('Cheater!!! Or possibly made a typo...')
         return user_selection
 
@@ -90,12 +91,12 @@ class Game:
     def full_roll(self, session, bank, game_round, remaining_die):
         
         (die_roll, string_roll) = self.new_roll(session, game_round, remaining_die)
-        user_selection = self.check_validity(bank, die_roll, string_roll)
+        user_selection = self.check_validity(session, bank, die_roll, string_roll)
 
         remaining_die -= len(user_selection)
         round_points = session.calculate_score(die_roll)
         bank.shelf(session.calculate_score(user_selection))
-        unbanked_points = session.calculate_score(set(die_roll)- set(user_selection))
+        unbanked_points = round_points-bank.shelved
 
         if round_points == 0:
             print('****************************************\n**        Zilch!!! Round over         **\n****************************************')

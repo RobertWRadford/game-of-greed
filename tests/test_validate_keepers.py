@@ -26,3 +26,10 @@ def test_validate_illegal_overflow():
     actual = GameLogic.validate_keepers(roll, keepers)
     expected = False
     assert actual == expected
+
+def test_validate_multiples():
+    roll = (1,1,1,5,5)
+    keepers = (1, 1, 1, 5, 5)
+    actual = GameLogic.validate_keepers(roll, keepers)
+    expected = True
+    assert actual == expected
