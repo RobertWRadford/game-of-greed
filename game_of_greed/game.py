@@ -46,8 +46,9 @@ class Game:
             game_round += 1
             print(f"Starting round {game_round}")
             print(f"Rolling {remaing_die} dice...")
-            die_roll = session.roll_dice(remaing_die)            
-            print(f'*** {" ".join(die_roll)} ***')
+            die_roll = session.roll_dice(remaing_die)
+            string_roll = [str(int) for int in die_roll]
+            print(f'*** {" ".join(string_roll)} ***')
             print("Enter dice to keep, or (q)uit:")
             kept_die = input("> ")
             if kept_die == "q":
@@ -58,34 +59,24 @@ class Game:
             shelf_points = session.calculate_score(user_selection)
             round_points = session.calculate_score(die_roll)
             unbanked_points = session.calculate_score(set(die_roll)- set(user_selection))
-            print(f"You have {unbanked_points} unbanked points and {remaing_die} dice remaining")
-            print("(r)oll again, (b)ank your points or (q)uit:")
-            round_choice = input("> ")
-            if round_choice == "q":
-                print(f"Thanks for playing. You earned {point_total} points")
-                break
-            elif round_choice == "b":
-                point_total += round_points
-                remaing_die = 6
+            if round_points == 0:
+                print('****************************************\n**        Zilch!!! Round over         **\n****************************************')
                 print(f"You banked {round_points} points in round {game_round}")
-            elif round_choice == "r":
-                point_total += shelf_points
+            else:
+                print(f"You have {unbanked_points} unbanked points and {remaing_die} dice remaining")
+                print("(r)oll again, (b)ank your points or (q)uit:")
+                round_choice = input("> ")
+                if round_choice == "q":
+                    print(f"Thanks for playing. You earned {point_total} points")
+                    break
+                elif round_choice == "b":
+                    point_total += round_points
+                    remaing_die = 6
+                    print(f"You banked {round_points} points in round {game_round}")
+                elif round_choice == "r":
+                    point_total += shelf_points
             print(f"Total score is {point_total} points")
                     
-                    
-
-
-
-
-
-
-
-
-
-
-        
-
-
 if __name__ == "__main__":
     game = Game()
     game.play()
