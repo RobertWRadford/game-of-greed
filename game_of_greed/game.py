@@ -1,3 +1,4 @@
+import sys
 from game_of_greed.game_logic import Banker, GameLogic
 
 
@@ -8,6 +9,8 @@ class Game:
     def __init__(self, num_rounds=20):
         self.banker = Banker()
         self.num_rounds = num_rounds
+        self._roller = None
+        self.round_num = 0
 
     def play(self, roller=None):
         """Entry point for playing (or declining) a game
@@ -34,58 +37,82 @@ class Game:
     def decline_game(self):
         print("OK. Maybe another time")
 
+    def new_roll(self, session, game_round, remaining_die):
+        print(f"Rolling {remaining_die} dice...")
+        die_roll = self._roller(remaining_die)
+        string_roll = [str(int) for int in die_roll]
+        return (die_roll, string_roll)
 
+    def check_validity(self, session, bank, die_roll, string_roll):
+        cheated = True
+        while cheated:
+            cheated = False
+            print(f'*** {" ".join(string_roll)} ***')
+            round_points = session.calculate_score(die_roll)
+            if round_points == 0:
+                return 'Zilch'
+            print("Enter dice to keep, or (q)uit:")
+            kept_die = input("> ")
+            saved_die = list(kept_die)
+            if kept_die == "q":
+                print(f"Thanks for playing. You earned {bank.total} points")
+                sys.exit()
+
+            good_input = True
+            for value in saved_die:
+                try:
+                    int(value)
+                except:
+                    saved_die.remove(value)
+
+            user_selection = tuple(int(char) for char in saved_die)
+            no_cheats = session.validate_keepers(die_roll, user_selection)
+            if not no_cheats:
+                cheated = True
+                print('Cheater!!! Or possibly made a typo...')
+        return user_selection
+
+    def round_decisions(self, session, bank, game_round, remaining_die):
+        print(f"You have {bank.shelved} unbanked points and {remaining_die} dice remaining")
+        print("(r)oll again, (b)ank your points or (q)uit:")
+        round_choice = input("> ")
+        if round_choice == "q":
+            print(f"Thanks for playing. You earned {bank.total} points")
+            sys.exit()
+        elif round_choice == "b":
+            round_points = bank.bank()
+            remaining_die = 6
+            print(f"You banked {round_points} points in round {game_round}")
+        elif round_choice == "r":
+            if remaining_die == 0:
+                remaining_die = 6
+            self.full_roll(session, bank, game_round, remaining_die)
+
+    def full_roll(self, session, bank, game_round, remaining_die):
+        
+        (die_roll, string_roll) = self.new_roll(session, game_round, remaining_die)
+        user_selection = self.check_validity(session, bank, die_roll, string_roll)
+
+        if user_selection == 'Zilch':
+            print('****************************************\n**        Zilch!!! Round over         **\n****************************************')
+            print(f"You banked 0 points in round {game_round}")
+        else:
+            remaining_die -= len(user_selection)
+            round_points = session.calculate_score(die_roll)
+            bank.shelf(session.calculate_score(user_selection))
+            self.round_decisions(session, bank, game_round, remaining_die)
 
     def start_game(self):
         session = GameLogic()
+        bank = Banker()
         game_round = 0
-        point_total = 0
-        remaing_die = 6 
+        remaining_die = 6 
         
-        while point_total< 10000:
+        while bank.total < 10000:
             game_round += 1
             print(f"Starting round {game_round}")
-            print(f"Rolling {remaing_die} dice...")
-            die_roll = session.roll_dice(remaing_die)  
-            string_roll = [str(int) for int in die_roll]
-            print(f'*** {string_roll} ***')
-            print("Enter dice to keep, or (q)uit:")
-            kept_die = input("> ")
-            if kept_die == "q":
-                print(f"Thanks for playing. You earned {point_total} points")
-                break
-            user_selection = tuple(int(char)for char in kept_die)
-            remaing_die -= len(user_selection)
-            shelf_points = session.calculate_score(user_selection)
-            round_points = session.calculate_score(die_roll)
-            unbanked_points = session.calculate_score(set(die_roll)- set(user_selection))
-            print(f"You have {unbanked_points} unbanked points and {remaing_die} dice remaining")
-            print("(r)oll again, (b)ank your points or (q)uit:")
-            round_choice = input("> ")
-            if round_choice == "q":
-                print(f"Thanks for playing. You earned {point_total} points")
-                break
-            elif round_choice == "b":
-                point_total += round_points
-                remaing_die = 6
-                print(f"You banked {round_points} points in round {game_round}")
-            elif round_choice == "r":
-                point_total += shelf_points
-            print(f"Total score is {point_total} points")
-
-                    
-
-
-
-
-
-
-
-
-
-
-        
-
+            self.full_roll(session, bank, game_round, remaining_die)
+            print(f"Total score is {bank.total} points")
 
 if __name__ == "__main__":
     game = Game()
