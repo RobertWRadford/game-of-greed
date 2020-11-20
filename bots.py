@@ -157,11 +157,11 @@ class YourBot(BaseBot):
     def _zilch_chance(self):
         return {
             1: 2/3,
-            2: 1/2.3,
-            3: 1/3.6,
-            4: 1/6.4,
-            5: 1/13,
-            6: 1/43.2,
+            2: 4/9,
+            3: 5/18,
+            4: 17/108,
+            5: 25/324,
+            6: 5/216,
         }[self.dice_remaining]
 
     def _roll_bank_or_quit(self):
@@ -169,7 +169,7 @@ class YourBot(BaseBot):
         if not self.dice_remaining:
             return 'r'
 
-        if self._zilch_chance() > (109/(self.unbanked_points+1)):
+        if self._zilch_chance() > (95/(self.unbanked_points)):
             return "b"
 
         return "r"
@@ -199,12 +199,16 @@ class YourBot(BaseBot):
                 two_count += 1
             elif value == '3':
                 three_count += 1
-        if five_count <= 2:
-            roll_string.replace('5','',1)
-        if two_count <= 4:
+        
+        if two_count <= 4 and two_count != len(roll):
             roll_string.replace('2','',two_count)
-        if three_count <= 3:
+        if three_count <= 3 and three_count != len(roll):
             roll_string.replace('3','',three_count)
+        if five_count <= 2:
+            if five_count == len(roll_string):
+                roll_string.replace('5','',1)
+            else:
+                roll_string.replace('5','',five_count)
 
         if roll_string == '':
             roll_string += str(roll[0])
@@ -215,8 +219,8 @@ class YourBot(BaseBot):
 
 
 if __name__ == "__main__":
-    num_games = 100000
-    NervousNellie.play(num_games)
-    MiddlingMargaret.play(num_games)
-    DaringDarla.play(num_games)
+    num_games = 1000
+    # NervousNellie.play(num_games)
+    # MiddlingMargaret.play(num_games)
+    # DaringDarla.play(num_games)
     YourBot.play(num_games)
