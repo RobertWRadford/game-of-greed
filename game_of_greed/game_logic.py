@@ -39,6 +39,7 @@ class GameLogic:
 				if GameLogic.calculate_score(value_type):
 					truthy_scorers.extend(value_type)
 
+		truthy_scorers.sort()
 		return tuple(truthy_scorers)
 
 	@staticmethod
